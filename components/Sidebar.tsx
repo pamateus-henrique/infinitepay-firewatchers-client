@@ -12,7 +12,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const menuItems = [
     { name: "Home", path: "/dashboard" },
-    { name: "Incidents", path: "/dashboard/incidents" },
+    { name: "Incidents", path: "/incidents" },
     // ... other menu items
   ];
 

@@ -5,6 +5,7 @@ import IncidentCard from "@/components/IncidentCard";
 import { FaFire } from "react-icons/fa";
 import { api } from "@/utils/api";
 import { IncidentOverview } from "@/models/incident";
+import { Separator } from "@/components/ui/separator";
 
 export default function DashboardHome() {
   const [incidents, setIncidents] = useState<IncidentOverview[]>([]);
@@ -29,15 +30,17 @@ export default function DashboardHome() {
   }, []);
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4'>
       <header className='flex justify-between items-center'>
-        <h1 className='text-3xl font-bold'>Home</h1>
-        <button className='p-2 sm:px-4 sm:py-2 bg-red-600 text-white rounded-md flex items-center'>
+        <h1 className='text-2xl font-bold'>Home</h1>
+        <button className='p-2 sm:px-4 sm:py-2 bg-black text-white rounded-md flex items-center'>
           <FaFire className='w-5 h-5' />
           <span className='hidden sm:inline ml-2'>Declare Incident</span>
         </button>
       </header>
-
+      <div className='-mx-8'>
+        <Separator />
+      </div>
       <section>
         <h2 className='text-xl font-semibold mb-4'>
           <span className='text-red-500 mr-2'>●</span>

@@ -1,75 +1,57 @@
 import React from "react";
+import { IncidentOverview } from "@/models/incident";
+import { calculateTimeDifference } from "@/utils/time";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
-interface Incident {
-  id: string;
-  title: string;
-  severity: "Major" | "Minor";
-  status: string;
-  team: string;
-  duration: string;
-  reportedTime: string;
-  reporter: string;
+interface IncidentListProps {
+  incidents: IncidentOverview[];
 }
 
-const incidents: Incident[] = [
-  {
-    id: "INC-3418",
-    title: "Pix Core is down",
-    severity: "Major",
-    status: "Monitoring",
-    team: "Pix",
-    duration: "3h 3m",
-    reportedTime: "Reported 3h 3m ago",
-    reporter: "Everton Costa",
-  },
-  {
-    id: "INC-3417",
-    title:
-      "Transactions being reverted on authorizer and infinitecard creation/tokenization failing",
-    severity: "Minor",
-    status: "Documentation",
-    team: "Authorization",
-    duration: "5h 55m",
-    reportedTime: "Reported 5h 55m ago",
-    reporter: "Jhonatan Figueiredo Cardoso",
-  },
-  // Add more incidents here...
-];
-
-const IncidentList: React.FC = () => {
+const IncidentList: React.FC<IncidentListProps> = ({ incidents }) => {
   return (
-    <ul>
+    <ul className='divide-y divide-gray-200'>
       {incidents.map((incident) => (
-        <li key={incident.id} className='border-b last:border-b-0'>
-          <div className='flex items-center p-4 hover:bg-gray-50 cursor-pointer'>
-            <input type='checkbox' className='mr-4' />
-            <div className='flex-grow'>
-              <div className='flex items-center space-x-2 mb-1'>
-                <span className='font-semibold'>{incident.id}</span>
-                <span>{incident.title}</span>
-              </div>
-              <div className='flex items-center space-x-2 text-sm text-gray-600'>
-                <span
-                  className={`px-2 py-1 rounded ${
-                    incident.severity === "Major"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {incident.severity}
-                </span>
-                <span className='px-2 py-1 rounded bg-blue-100 text-blue-800'>
-                  {incident.status}
-                </span>
-                <span className='px-2 py-1 rounded bg-gray-100'>
-                  {incident.team}
-                </span>
-                <span>{incident.duration}</span>
-                <span>{incident.reportedTime}</span>
-                <span>{incident.reporter}</span>
+        <li key={incident.id}>
+          <div className='p-4 hover:bg-gray-50 cursor-pointer'>
+            <div className='flex items-start space-x-3'>
+              <input type='checkbox' className='mt-1' />
+              <div className='flex-grow space-y-1'>
+                <div className='flex items-center space-x-2'>
+                  <span className='font-semibold text-sm'>
+                    INC-{incident.id}
+                  </span>
+                  <span className='text-sm'>{incident.title}</span>
+                </div>
+                <div className='flex flex-wrap items-center gap-2 text-xs text-gray-600'>
+                  <span
+                    className={`px-2 py-0.5 rounded ${
+                      incident.severity === "Major"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {incident.severity === "Major" ? "Major" : "Investigating"}
+                  </span>
+                  <span className='px-2 py-0.5 rounded bg-gray-100'>
+                    {incident.type || "Default"}
+                  </span>
+                  <span>
+                    Reported {calculateTimeDifference(incident.impactStartedAt)}{" "}
+                    ago
+                  </span>
+                  <div className='flex items-center space-x-1'>
+                    <Avatar className='h-5 w-5'>
+                      <AvatarImage
+                        src={incident.leadAvatar}
+                        alt={incident.lead}
+                      />
+                      <AvatarFallback>{incident.lead[0]}</AvatarFallback>
+                    </Avatar>
+                    <span>{incident.lead}</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <span className='text-gray-400'>›</span>
           </div>
         </li>
       ))}

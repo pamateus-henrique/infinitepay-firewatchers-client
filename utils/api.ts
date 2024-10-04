@@ -3,7 +3,7 @@ import { parseCookies, setCookie } from "nookies";
 const API_BASE_URL = "http://localhost:8080/api/v1"; // Adjust this to your Go backend URL
 
 interface FetchOptions extends RequestInit {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   data?: object;
 }
 
@@ -66,4 +66,6 @@ export const api = {
     fetchWrapper(endpoint, { ...options, method: "PUT", data }),
   delete: (endpoint: string, options?: FetchOptions) =>
     fetchWrapper(endpoint, { ...options, method: "DELETE" }),
+  patch: (endpoint: string, options?: FetchOptions) =>
+    fetchWrapper(endpoint, { ...options, method: "PATCH" }),
 };
