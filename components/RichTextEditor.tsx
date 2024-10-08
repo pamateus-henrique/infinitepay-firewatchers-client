@@ -2,22 +2,29 @@ import React, { useState } from "react";
 import { Content } from "@tiptap/react";
 import { MinimalTiptapEditor } from "./minimal-tiptap";
 import { Button } from "@/components/ui/button";
+import DOMPurify from "dompurify";
 
 interface RichTextEditorProps {
   initialContent: string;
-  onSave: (content: string) => void;
+  onSave: (content: { html: string; plainText: string }) => void;
+  isSaving: boolean;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   initialContent,
   onSave,
+  isSaving,
 }) => {
   const [value, setValue] = useState<Content>(initialContent);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSave = () => {
     if (typeof value === "string") {
-      onSave(value);
+      const sanitizedHtml = DOMPurify.sanitize(value);
+      const plainText =
+        new DOMParser().parseFromString(sanitizedHtml, "text/html").body
+          .textContent || "";
+      onSave({ html: sanitizedHtml, plainText });
       setIsEditing(false);
     } else {
       console.error("Unexpected value type");
@@ -54,8 +61,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         editorClassName='focus:outline-none'
       />
       <div className='space-x-2'>
-        <Button onClick={handleSave}>Save</Button>
-        <Button variant='outline' onClick={() => setIsEditing(false)}>
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
+        <Button
+          variant='outline'
+          onClick={() => setIsEditing(false)}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
       </div>

@@ -11,13 +11,17 @@ import IncidentUpdates from "@/components/IncidentUpdates";
 import RichTextEditor from "@/components/RichTextEditor";
 
 export default function IncidentDetailPage() {
-  const { incidentId } = useParams();
+  const params = useParams();
+  const incidentId = params.incidentId as string;
   const [incident, setIncident] = useState<Incident | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     async function fetchIncident() {
+      if (!incidentId) return;
+      setIsLoading(true);
       try {
         const response = await api.get(`/incidents/${incidentId}`);
         setIncident(response.data.incidents);
@@ -31,18 +35,35 @@ export default function IncidentDetailPage() {
     }
 
     fetchIncident();
-  }, [incidentId]);
+  }, []); // Empty dependency array
 
-  const handleSummarySave = async (newSummary: string) => {
+  const handleSummarySave = async (newContent: {
+    html: string;
+    plainText: string;
+  }) => {
+    setIsSaving(true);
     try {
-      await api.patch(`/incidents/${incidentId}`, {
-        data: { summary: newSummary },
+      const incidentIdInt = parseInt(incidentId, 10);
+      if (isNaN(incidentIdInt)) {
+        throw new Error("Invalid incident ID");
+      }
+      const result = await api.post("/incidents/update/summary", {
+        id: incidentIdInt,
+        summary: newContent.html,
       });
-      setIncident((prev) => (prev ? { ...prev, summary: newSummary } : null));
-      // You might want to show a success message to the user here
+      if (result.status === 200) {
+        setIncident((prev) =>
+          prev ? { ...prev, summary: newContent.html } : null
+        );
+        // You might want to show a success message to the user here
+      } else {
+        throw new Error("Failed to save content");
+      }
     } catch (err) {
       console.error("Error updating summary:", err);
       // You might want to show an error message to the user here
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -77,6 +98,7 @@ export default function IncidentDetailPage() {
             <RichTextEditor
               initialContent={incident.summary}
               onSave={handleSummarySave}
+              isSaving={isSaving}
             />
           </div>
           <IncidentUpdates incident={incident} />

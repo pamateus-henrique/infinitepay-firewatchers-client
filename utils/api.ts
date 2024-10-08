@@ -66,6 +66,6 @@ export const api = {
     fetchWrapper(endpoint, { ...options, method: "PUT", data }),
   delete: (endpoint: string, options?: FetchOptions) =>
     fetchWrapper(endpoint, { ...options, method: "DELETE" }),
-  patch: (endpoint: string, options?: FetchOptions) =>
-    fetchWrapper(endpoint, { ...options, method: "PATCH" }),
+  patch: (endpoint: string, data: object, options?: FetchOptions) =>
+    fetchWrapper(endpoint, { ...options, method: "PATCH", data }),
 };
