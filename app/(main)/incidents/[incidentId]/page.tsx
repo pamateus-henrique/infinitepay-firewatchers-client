@@ -35,7 +35,7 @@ export default function IncidentDetailPage() {
     }
 
     fetchIncident();
-  }, []); // Empty dependency array
+  }, []);
 
   const handleSummarySave = async (newContent: {
     html: string;

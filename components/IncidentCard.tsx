@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, AlertTriangle, Activity, Tag } from "lucide-react";
 import { calculateTimeDifference } from "@/utils/time";
+import DOMPurify from "dompurify";
 
 interface IncidentCardProps {
   id: number;
@@ -29,6 +30,9 @@ const IncidentCard: React.FC<IncidentCardProps> = ({
   leadAvatar,
 }) => {
   const timeDifference = calculateTimeDifference(impactStartedAt);
+
+  // Sanitize the summary HTML
+  const sanitizedSummary = DOMPurify.sanitize(summary);
 
   return (
     <Link href={`/incidents/${id}`} className='block'>
@@ -76,9 +80,10 @@ const IncidentCard: React.FC<IncidentCardProps> = ({
         <Separator />
         {/* Section 3: Fixed-size Description and Reporter */}
         <div className='flex-grow flex flex-col justify-between p-2 h-48'>
-          <p className='text-gray-600 mb-2 line-clamp-3 overflow-hidden'>
-            {summary}
-          </p>
+          <div
+            className='text-gray-600 mb-2 line-clamp-3 overflow-hidden'
+            dangerouslySetInnerHTML={{ __html: sanitizedSummary }}
+          />
           <div className='px-1 flex gap-2 items-center'>
             <Avatar className='h-6 w-6'>
               <AvatarImage src={leadAvatar} alt={"Lead Image"} />
