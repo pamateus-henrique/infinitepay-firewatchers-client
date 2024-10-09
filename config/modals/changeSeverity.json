@@ -1,0 +1,13 @@
+{
+  "id": "changeSeverity",
+  "title": "Change Incident Severity",
+  "fields": [
+    {
+      "name": "severity",
+      "label": "New Severity",
+      "type": "select",
+      "options": ["No costumer impact", "Minor", "Major", "Critical"]
+    }
+  ],
+  "apiEndpoint": "/incidents/update/severity"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "changeStatus",
+  "title": "Change Incident Status",
+  "fields": [
+    {
+      "name": "status",
+      "label": "New Status",
+      "type": "select",
+      "options": [
+        "Investigating",
+        "Fixing",
+        "Monitoring",
+        "Cleanup",
+        "Documentation",
+        "InReview"
+      ]
+    }
+  ],
+  "apiEndpoint": "/incidents/update/status"
+}

@@ -9,6 +9,8 @@ import IncidentStatusBar from "@/components/IncidentStatusBar";
 import IncidentParticipants from "@/components/IncidentParticipants";
 import IncidentUpdates from "@/components/IncidentUpdates";
 import RichTextEditor from "@/components/RichTextEditor";
+import { toast } from "react-toastify";
+import DynamicModal from "@/components/DynamicModal";
 
 export default function IncidentDetailPage() {
   const params = useParams();
@@ -17,6 +19,7 @@ export default function IncidentDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchIncident() {
@@ -67,6 +70,10 @@ export default function IncidentDetailPage() {
     }
   };
 
+  const handleModalSuccess = (updatedData: Record<string, any>) => {
+    setIncident((prev) => (prev ? { ...prev, ...updatedData } : null));
+  };
+
   if (isLoading) return <p>Loading incident details...</p>;
   if (error) return <p className='text-red-500'>{error}</p>;
   if (!incident) return <p>Incident not found.</p>;
@@ -90,6 +97,7 @@ export default function IncidentDetailPage() {
         severity={incident.severity}
         type={incident.type}
         duration='Ongoing for 2mo'
+        setActiveModal={setActiveModal}
       />
       <div className='flex mt-4'>
         <div className='w-full md:w-3/4 px-8'>
@@ -107,6 +115,14 @@ export default function IncidentDetailPage() {
           <IncidentParticipants incident={incident} />
         </div>
       </div>
+      <DynamicModal
+        isOpen={!!activeModal}
+        onClose={() => setActiveModal(null)}
+        modalId={activeModal || ""}
+        incidentId={parseInt(incidentId, 10)}
+        initialData={incident || {}}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }
