@@ -52,7 +52,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <MinimalTiptapEditor
         value={value}
         onChange={setValue}
-        className='w-full'
+        className='w-full bg-white'
         editorContentClassName='p-5'
         output='html'
         placeholder='Type your description here...'

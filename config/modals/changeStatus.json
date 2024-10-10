@@ -3,6 +3,12 @@
   "title": "Change Incident Status",
   "fields": [
     {
+      "name": "test",
+      "label": "test Status",
+      "type": "radio",
+      "options": ["Active", "Paused", "Resolved"]
+    },
+    {
       "name": "status",
       "label": "New Status",
       "type": "select",

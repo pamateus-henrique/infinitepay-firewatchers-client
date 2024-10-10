@@ -36,7 +36,6 @@ const IncidentParticipants: React.FC<IncidentParticipantsProps> = ({
 }) => {
   return (
     <div>
-      <h2 className='text-xl font-semibold mb-4'>Incident Participants</h2>
       <Participant
         role='Incident Lead'
         name={incident?.leadName}

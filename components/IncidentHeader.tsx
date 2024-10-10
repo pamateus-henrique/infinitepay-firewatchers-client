@@ -13,7 +13,7 @@ const IncidentHeader: React.FC<IncidentHeaderProps> = ({
 }) => {
   return (
     <div className='bg-white border-b'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+      <div className='max-w-7xl px-4 sm:px-6 lg:px-8 py-4'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-center'>
             <div className='bg-red-100 p-2 rounded-lg mr-3'>

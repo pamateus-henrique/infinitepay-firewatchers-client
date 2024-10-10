@@ -102,7 +102,6 @@ export default function IncidentDetailPage() {
       <div className='flex mt-4'>
         <div className='w-full md:w-3/4 px-8'>
           <div className='mb-6'>
-            <h2 className='text-2xl font-bold mb-2'>Summary</h2>
             <RichTextEditor
               initialContent={incident.summary}
               onSave={handleSummarySave}
