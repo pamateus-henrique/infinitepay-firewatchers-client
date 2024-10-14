@@ -1,5 +1,7 @@
 import React from "react";
 
+import { IncidentStages } from "@/models/options";
+
 interface IncidentStatusBarProps {
   stages: string[];
   status: string;
@@ -73,7 +75,10 @@ const IncidentStatusBar: React.FC<IncidentStatusBarProps> = ({
         >
           {severity}
         </span>
-        <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded'>
+        <span
+          className='bg-blue-100 text-blue-800 px-2 py-1 rounded'
+          onClick={() => setActiveModal("changeType")}
+        >
           {type}
         </span>
         <span className='bg-gray-100 text-gray-800 px-2 py-1 rounded'>

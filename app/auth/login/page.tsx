@@ -28,8 +28,6 @@ export default function LoginPage() {
     setError(null);
     try {
       const result = await api.post("/auth/login", data);
-      console.log("Login successful:", result);
-      console.log("Attempting to redirect to dashboard...");
       router.replace("/dashboard");
     } catch (error) {
       console.error("An error occurred:", error);

@@ -9,7 +9,6 @@ import IncidentStatusBar from "@/components/IncidentStatusBar";
 import IncidentParticipants from "@/components/IncidentParticipants";
 import IncidentUpdates from "@/components/IncidentUpdates";
 import RichTextEditor from "@/components/RichTextEditor";
-import { toast } from "react-toastify";
 import DynamicModal from "@/components/DynamicModal";
 
 export default function IncidentDetailPage() {
@@ -20,25 +19,40 @@ export default function IncidentDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [stages, setStages] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchIncident() {
+    async function fetchIncidentAndStages() {
       if (!incidentId) return;
       setIsLoading(true);
       try {
-        const response = await api.get(`/incidents/${incidentId}`);
-        setIncident(response.data.incidents);
-        console.log(response.data.incidents);
+        const [incidentResponse, stagesResponse] = await Promise.all([
+          api.get(`/incidents/${incidentId}`),
+          api.get("/options/status"),
+        ]);
+        setIncident(incidentResponse.data.incidents);
+        console.log(stagesResponse);
+        const stages = stagesResponse.data.status.map((stage: any) => {
+          return stage.name;
+        });
+        if (stagesResponse.error === false) {
+          setStages(stages);
+        } else {
+          console.error("Unexpected format for statuses data:", stagesResponse);
+          setStages([]);
+        }
       } catch (err) {
-        setError("Error fetching incident details. Please try again later.");
+        setError(
+          "Error fetching incident details or statuses. Please try again later."
+        );
         console.error(err);
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchIncident();
-  }, []);
+    fetchIncidentAndStages();
+  }, [incidentId]);
 
   const handleSummarySave = async (newContent: {
     html: string;
@@ -85,14 +99,7 @@ export default function IncidentDetailPage() {
         title={incident.title}
       />
       <IncidentStatusBar
-        stages={[
-          "Investigating",
-          "Fixing",
-          "Monitoring",
-          "Cleanup",
-          "Documentation",
-          "InReview",
-        ]}
+        stages={stages}
         status={incident.status}
         severity={incident.severity}
         type={incident.type}

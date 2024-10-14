@@ -3,23 +3,10 @@
   "title": "Change Incident Status",
   "fields": [
     {
-      "name": "test",
-      "label": "test Status",
-      "type": "radio",
-      "options": ["Active", "Paused", "Resolved"]
-    },
-    {
       "name": "status",
       "label": "New Status",
       "type": "select",
-      "options": [
-        "Investigating",
-        "Fixing",
-        "Monitoring",
-        "Cleanup",
-        "Documentation",
-        "InReview"
-      ]
+      "optionsEndpoint": "/options/status"
     }
   ],
   "apiEndpoint": "/incidents/update/status"

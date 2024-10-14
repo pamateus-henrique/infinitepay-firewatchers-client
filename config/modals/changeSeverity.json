@@ -6,7 +6,7 @@
       "name": "severity",
       "label": "New Severity",
       "type": "select",
-      "options": ["No costumer impact", "Minor", "Major", "Critical"]
+      "optionsEndpoint": "/options/severity"
     }
   ],
   "apiEndpoint": "/incidents/update/severity"

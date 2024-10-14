@@ -16,7 +16,6 @@ export default function DashboardHome() {
     async function fetchIncidents() {
       try {
         const response = await api.get("/incidents"); // Adjust the URL to match your API endpoint
-        console.log(response.data.incidents);
         setIncidents(response.data.incidents);
       } catch (err) {
         setError("Error fetching incidents. Please try again later.");
