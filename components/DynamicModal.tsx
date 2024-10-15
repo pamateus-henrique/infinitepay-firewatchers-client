@@ -22,11 +22,21 @@ import { api } from "@/utils/api";
 import { toast } from "react-toastify";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+interface Option {
+  id: number | string;
+  name: string;
+  avatar?: string;
+}
+
 interface ModalField {
   name: string;
+  data: string;
   label: string;
-  type: string;
-  optionsEndpoint: string;
+  initialData: string;
+  type: "text" | "select" | "radio" | "userSelect";
+  optionsEndpoint?: string;
+  description?: string;
+  optional?: boolean;
 }
 
 interface ModalConfig {
@@ -45,11 +55,6 @@ interface DynamicModalProps {
   onSuccess: (updatedData: Record<string, any>) => void;
 }
 
-interface Option {
-  id: string | number;
-  name: string;
-}
-
 const DynamicModal: React.FC<DynamicModalProps> = ({
   isOpen,
   onClose,
@@ -65,35 +70,46 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
   );
 
   useEffect(() => {
-    const loadConfig = async () => {
+    if (!isOpen) return;
+
+    const loadConfigAndOptions = async () => {
       try {
-        const config: ModalConfig = await import(
-          `@/config/modals/${modalId}.json`
-        );
+        // Update the import statement to handle TypeScript modules
+        const configModule = await import(`@/config/modals/${modalId}`);
+        const config: ModalConfig = configModule.default;
         setModalConfig(config);
 
-        // Filter and format initial data
-        const filteredData = config.fields.reduce((acc, field) => {
-          if (initialData.hasOwnProperty(field.name)) {
-            acc[field.name] = initialData[field.name];
+        // Setup initial form data
+        const initialFormData = config.fields.reduce((acc, field) => {
+          const value = initialData[field.initialData];
+          if (value !== undefined) {
+            if (
+              field.type === "userSelect" &&
+              typeof value === "object" &&
+              value.id
+            ) {
+              acc[field.name] = value.id.toString();
+            } else {
+              acc[field.name] = value.toString();
+            }
           }
           return acc;
-        }, {} as Record<string, any>);
-        setFormData(filteredData);
+        }, {} as Record<string, string>);
 
-        // Process options for all fields
-        const allFieldOptions = await Promise.all(
-          config.fields.map(async (field) => {
-            const response = await api.get(field.optionsEndpoint);
-            // Extract the correct array from the response data
+        setFormData(initialFormData);
 
-            const optionsArray = response.data[field.name] || [];
+        // Fetch options for fields
+        const optionsPromises = config.fields
+          .filter((field) => field.optionsEndpoint)
+          .map(async (field) => {
+            const response = await api.get(field.optionsEndpoint!);
+            const optionsArray: Option[] = response.data[field.data] || [];
             return { [field.name]: optionsArray };
-          })
-        );
+          });
 
-        setFieldOptions(Object.assign({}, ...allFieldOptions));
-        console.log(fieldOptions);
+        const optionsArray = await Promise.all(optionsPromises);
+        const options = Object.assign({}, ...optionsArray);
+        setFieldOptions(options);
       } catch (error) {
         console.error(`Failed to load modal config for ${modalId}:`, error);
         toast.error("Failed to load modal configuration");
@@ -101,10 +117,8 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
       }
     };
 
-    if (isOpen) {
-      loadConfig();
-    }
-  }, [isOpen, modalId, onClose, initialData]);
+    loadConfigAndOptions();
+  }, [isOpen, modalId, initialData, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,11 +139,11 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
         throw new Error(result.msg || `Failed to update ${modalConfig.id}`);
       }
     } catch (err) {
-      console.error(`Error updating ${modalConfig.id}:`, err);
+      console.error(`Error updating ${modalConfig?.id}:`, err);
       toast.error(
         err instanceof Error
           ? err.message
-          : `Failed to update ${modalConfig.title.toLowerCase()}`
+          : `Failed to update ${modalConfig?.title.toLowerCase()}`
       );
     }
   };
@@ -138,13 +152,89 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const renderSelectOptions = (field: ModalField) => {
-    const options = fieldOptions[field.name] || [];
-    return options.map((option: Option) => (
-      <SelectItem key={option.id} value={option.name.toString()}>
-        {option.name}
-      </SelectItem>
-    ));
+  const renderField = (field: ModalField) => {
+    const value = formData[field.name] || "";
+    switch (field.type) {
+      case "select":
+        return (
+          <Select
+            name={field.name}
+            value={value}
+            onValueChange={(val) => handleInputChange(field.name, val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder='Select an option' />
+            </SelectTrigger>
+            <SelectContent>
+              {fieldOptions[field.name]?.map((option) => (
+                <SelectItem key={option.id} value={option.name.toString()}>
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case "radio":
+        return (
+          <RadioGroup
+            name={field.name}
+            value={value}
+            onValueChange={(val) => handleInputChange(field.name, val)}
+          >
+            {fieldOptions[field.name]?.map((option) => (
+              <div key={option.id} className='flex items-center space-x-2'>
+                <RadioGroupItem
+                  value={option.id.toString()}
+                  id={`${field.name}-${option.id}`}
+                />
+                <Label htmlFor={`${field.name}-${option.id}`}>
+                  {option.name}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        );
+      case "userSelect":
+        return (
+          <Select
+            name={field.name}
+            value={value}
+            onValueChange={(val) => handleInputChange(field.name, val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder='Select a user' />
+            </SelectTrigger>
+            <SelectContent>
+              {fieldOptions[field.name]?.map((option) => (
+                <SelectItem key={option.id} value={option.id.toString()}>
+                  <div className='flex items-center'>
+                    {option.avatar && (
+                      <img
+                        src={option.avatar}
+                        alt={option.name}
+                        className='w-6 h-6 rounded-full mr-2'
+                      />
+                    )}
+                    {option.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case "text":
+        return (
+          <input
+            type='text'
+            name={field.name}
+            value={value}
+            onChange={(e) => handleInputChange(field.name, e.target.value)}
+            className='input-class'
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   if (!modalConfig) return null;
@@ -164,44 +254,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
                 <Label htmlFor={field.name} className='text-right'>
                   {field.label}
                 </Label>
-                {field.type === "select" && (
-                  <Select
-                    name={field.name}
-                    value={formData[field.name]?.toString() || ""}
-                    onValueChange={(value) =>
-                      handleInputChange(field.name, value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select an option' />
-                    </SelectTrigger>
-                    <SelectContent>{renderSelectOptions(field)}</SelectContent>
-                  </Select>
-                )}
-                {field.type === "radio" && (
-                  <RadioGroup
-                    name={field.name}
-                    value={formData[field.name] || ""}
-                    onValueChange={(value) =>
-                      handleInputChange(field.name, value)
-                    }
-                  >
-                    {fieldOptions[field.name]?.map((option: Option) => (
-                      <div
-                        key={option.id}
-                        className='flex items-center space-x-2'
-                      >
-                        <RadioGroupItem
-                          value={option.id.toString()}
-                          id={`${field.name}-${option.id}`}
-                        />
-                        <Label htmlFor={`${field.name}-${option.id}`}>
-                          {option.name}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                )}
+                {renderField(field)}
               </div>
             </React.Fragment>
           ))}

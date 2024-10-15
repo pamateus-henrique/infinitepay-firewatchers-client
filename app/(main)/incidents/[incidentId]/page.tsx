@@ -84,7 +84,7 @@ export default function IncidentDetailPage() {
     }
   };
 
-  const handleModalSuccess = (updatedData: Record<string, any>) => {
+  const handleModalSuccess = (updatedData: Partial<Incident>) => {
     setIncident((prev) => (prev ? { ...prev, ...updatedData } : null));
   };
 
@@ -118,7 +118,10 @@ export default function IncidentDetailPage() {
           <IncidentUpdates incident={incident} />
         </div>
         <div className='hidden md:block md:w-1/4 md:pr-0 pr-4'>
-          <IncidentParticipants incident={incident} />
+          <IncidentParticipants
+            incident={incident}
+            setActiveModal={setActiveModal}
+          />
         </div>
       </div>
       <DynamicModal
