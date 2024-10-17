@@ -37,6 +37,7 @@ interface ModalField {
   optionsEndpoint?: string;
   description?: string;
   optional?: boolean;
+  valueType?: "string" | "number" | "object"; // Added here
 }
 
 interface ModalConfig {
@@ -125,12 +126,39 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     if (!modalConfig) return;
 
     try {
-      const result = await api.post(modalConfig.apiEndpoint, {
-        id: incidentId,
-        ...formData,
+      // Process formData to convert values based on valueType
+      const processedData: Record<string, any> = { id: incidentId };
+
+      modalConfig.fields.forEach((field) => {
+        let value = formData[field.name];
+
+        if (value !== undefined) {
+          switch (field.valueType) {
+            case "number":
+              value = Number(value);
+              break;
+            case "string":
+              value = String(value);
+              break;
+            case "object":
+              try {
+                value = JSON.parse(value);
+              } catch {
+                value = value; // Keep as is if parsing fails
+              }
+              break;
+            default:
+              // Leave value as is
+              break;
+          }
+          processedData[field.name] = value;
+        }
       });
-      if (result.error === "false") {
-        onSuccess(formData);
+
+      const result = await api.post(modalConfig.apiEndpoint, processedData);
+
+      if (result.error === "false" || result.error === false) {
+        onSuccess(processedData);
         toast.success(
           result.msg || `${modalConfig.title} updated successfully`
         );

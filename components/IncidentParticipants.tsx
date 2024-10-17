@@ -15,24 +15,24 @@ const Participant: React.FC<ParticipantProps> = ({
   onClick,
 }) => (
   <div
-    className='flex items-center mb-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition-colors'
+    className='flex items-center mb-4 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition-colors'
     onClick={onClick}
   >
-    <div className='flex items-center'>
-      {avatar ? (
-        <img
-          src={avatar}
-          alt={name || "Avatar"}
-          className='w-8 h-8 rounded-full mr-2'
-        />
-      ) : (
-        <div className='w-8 h-8 rounded-full mr-2 bg-gray-200 flex items-center justify-center'>
-          <span className='text-gray-500 text-xs'>N/A</span>
-        </div>
-      )}
-      <div>
-        <div className='font-semibold'>{name || "Not assigned"}</div>
-        <div className='text-sm text-gray-500'>{role}</div>
+    <div className='flex items-center w-full text-sm justify-between'>
+      <div className=' text-gray-500'>{role}</div>
+      <div className=' flex items-center'>
+        {avatar ? (
+          <img
+            src={avatar}
+            alt={name || "Avatar"}
+            className='w-6 h-6 rounded-full mr-2'
+          />
+        ) : (
+          <div className='w-8 h-8 rounded-full mr-2 bg-gray-200 flex items-center justify-center'>
+            <span className='text-gray-500 text-xs'>N/A</span>
+          </div>
+        )}
+        <div className=''>{name || "Not assigned"}</div>
       </div>
     </div>
   </div>
@@ -64,17 +64,9 @@ const IncidentParticipants: React.FC<IncidentParticipantsProps> = ({
         role='QE'
         name={incident?.QEName}
         avatar={incident?.QEAvatar}
-        onClick={() => setActiveModal("updateQE")}
+        onClick={() => setActiveModal("changeRoles")}
       />
-      <h3 className='font-semibold mt-4 mb-2'>Active participants</h3>
-      {/* {incident.activeParticipants?.map((participant, index) => (
-        <Participant
-          key={index}
-          role="Active"
-          name={participant.name}
-          avatar={participant.avatar}
-        />
-      ))} */}
+      {/* Remove the "Active participants" section for now */}
     </div>
   );
 };

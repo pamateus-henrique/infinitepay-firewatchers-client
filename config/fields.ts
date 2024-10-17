@@ -7,15 +7,17 @@ export const leadField = {
   initialData: "lead",
   type: "userSelect",
   optionsEndpoint: "/users",
+  valueType: "number",
 };
 
 export const QEField = {
   name: "qe",
   data: "users",
   label: "QE",
-  initialData: "QE",
+  initialData: "qe",
   type: "userSelect",
   optionsEndpoint: "/users",
+  valueType: "number",
 };
 
 export const severityField = {
@@ -25,6 +27,7 @@ export const severityField = {
   data: "severity",
   type: "select",
   optionsEndpoint: "/options/severity",
+  valueType: "string",
 };
 
 export const typeField = {
@@ -34,6 +37,7 @@ export const typeField = {
   initialData: "type",
   type: "select",
   optionsEndpoint: "/options/types",
+  valueType: "string",
 };
 
 export const statusField = {
@@ -43,6 +47,7 @@ export const statusField = {
   initialData: "status",
   type: "select",
   optionsEndpoint: "/options/status",
+  valueType: "string",
 };
 
 // Add more fields as needed

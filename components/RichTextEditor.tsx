@@ -38,7 +38,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   if (!isEditing) {
     return (
       <div
-        className='bg-white p-4 rounded-md cursor-pointer'
+        className='bg-white p-4 rounded-md cursor-pointer border-slate-200 shadow-md border'
         onClick={handleEdit}
         dangerouslySetInnerHTML={{
           __html: typeof value === "string" ? value : "",
@@ -52,7 +52,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <MinimalTiptapEditor
         value={value}
         onChange={setValue}
-        className='w-full bg-white'
+        className='w-full'
         editorContentClassName='p-5'
         output='html'
         placeholder='Type your description here...'

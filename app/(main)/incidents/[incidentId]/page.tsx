@@ -10,6 +10,7 @@ import IncidentParticipants from "@/components/IncidentParticipants";
 import IncidentUpdates from "@/components/IncidentUpdates";
 import RichTextEditor from "@/components/RichTextEditor";
 import DynamicModal from "@/components/DynamicModal";
+import { Separator } from "@/components/ui/separator";
 
 export default function IncidentDetailPage() {
   const params = useParams();
@@ -20,6 +21,7 @@ export default function IncidentDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [stages, setStages] = useState<string[]>([]);
+  const [test, setTest] = useState(false);
 
   useEffect(() => {
     async function fetchIncidentAndStages() {
@@ -52,7 +54,7 @@ export default function IncidentDetailPage() {
     }
 
     fetchIncidentAndStages();
-  }, [incidentId]);
+  }, [incidentId, test]);
 
   const handleSummarySave = async (newContent: {
     html: string;
@@ -86,6 +88,7 @@ export default function IncidentDetailPage() {
 
   const handleModalSuccess = (updatedData: Partial<Incident>) => {
     setIncident((prev) => (prev ? { ...prev, ...updatedData } : null));
+    setTest(!test);
   };
 
   if (isLoading) return <p>Loading incident details...</p>;
@@ -106,7 +109,7 @@ export default function IncidentDetailPage() {
         duration='Ongoing for 2mo'
         setActiveModal={setActiveModal}
       />
-      <div className='flex mt-4'>
+      <div className='flex mt-4 '>
         <div className='w-full md:w-3/4 px-8'>
           <div className='mb-6'>
             <RichTextEditor
@@ -117,11 +120,12 @@ export default function IncidentDetailPage() {
           </div>
           <IncidentUpdates incident={incident} />
         </div>
-        <div className='hidden md:block md:w-1/4 md:pr-0 pr-4'>
+        <div className='hidden md:block md:w-1/4 md:pr-0 pr-4 mr-4'>
           <IncidentParticipants
             incident={incident}
             setActiveModal={setActiveModal}
           />
+          <Separator />
         </div>
       </div>
       <DynamicModal
